@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <windows.h>  
 #include <stdlib.h>
 #include <time.h>
 #include "listtest.h"
@@ -8,7 +7,9 @@
 #include "BiTree.h"
 #include "SearchAlgorithm.h"
 #include "SqStack.h"
-
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>  
+#endif
 void test1()
 {
 	LinkList lista = (LinkList)malloc(sizeof(LNode));
@@ -180,17 +181,21 @@ void RBtest1()
 	PRBNode tem = NULL;
 	int va = 0;
 	scanf("%d", &va);
+#if defined(_WIN32) || defined(_WIN64)
 	double time = 0;
 	LARGE_INTEGER nFreq;
 	LARGE_INTEGER nBeginTime;
 	LARGE_INTEGER nEndTime;
 	QueryPerformanceFrequency(&nFreq);
 	QueryPerformanceCounter(&nBeginTime);//开始计时  
+#endif
 //	tem = DeleteRBTree(&tree, va);
 	int a= SearchRBTree(tree, va,&tem);
+#if defined(_WIN32) || defined(_WIN64)
 	QueryPerformanceCounter(&nEndTime);//停止计时  
 	time = (double)(nEndTime.QuadPart - nBeginTime.QuadPart) / (double)nFreq.QuadPart;//计算程序执行时间单位为s  
 	printf("运行时间: %f ms", time * 1000);
+#endif
 }
 //红黑树测试
 void RBTreeTest()
@@ -289,20 +294,64 @@ int cmpfile(const char* file, const char* file1)
 	}
 
 }
-int main()
+void huffman(int argc, char* argv[])
 {
-	double time = 0;
-	LARGE_INTEGER nFreq;
-	LARGE_INTEGER nBeginTime;
-	LARGE_INTEGER nEndTime;
-	QueryPerformanceFrequency(&nFreq);
-	QueryPerformanceCounter(&nBeginTime);//开始计时  
-	//HuffmanEnCoding("D:\\downloads\\MediaCreationTool1909.exe","D:\\downloads\\MediaCreationTool1909");
-	HuffmanDeCoding("D:\\downloads\\MediaCreationTool1909","D:\\downloads\\MediaCreationTool1909-1.exe");
-	QueryPerformanceCounter(&nEndTime);//停止计时  
-	time = (double)(nEndTime.QuadPart - nBeginTime.QuadPart) / (double)nFreq.QuadPart;//计算程序执行时间单位为s  
-	printf("运行时间: %f ms", time * 1000);
+	if (argc < 4)
+	{
+		printf("usage : 'program -e srcfilename destfilename' encoding file\n"
+			"        'program -d srcfilename destfilename' decoding file\n");
+		return;
+	}
+	if (memcmp(argv[1], "-e", 3) == 0)
+	{
 
+		printf("encoding....\n");
+#if defined(_WIN32) || defined(_WIN64)
+		double time = 0;
+		LARGE_INTEGER nFreq;
+		LARGE_INTEGER nBeginTime;
+		LARGE_INTEGER nEndTime;
+		QueryPerformanceFrequency(&nFreq);
+		QueryPerformanceCounter(&nBeginTime);//开始计时 
+#endif
+		HuffmanEnCoding(argv[2], argv[3]);
+#if defined(_WIN32) || defined(_WIN64)
+		QueryPerformanceCounter(&nEndTime);//停止计时  
+		time = (double)(nEndTime.QuadPart - nBeginTime.QuadPart) / (double)nFreq.QuadPart;//计算程序执行时间单位为s  
+		printf("压缩时间: %f ms\n", time * 1000);
+#else
+		printf("压缩完成\n");
+#endif
+	}
+	else if (memcmp(argv[1], "-d", 3) == 0)
+	{
+		printf("decoding....\n");
+#if defined(_WIN32) || defined(_WIN64)
+		double time = 0;
+		LARGE_INTEGER nFreq;
+		LARGE_INTEGER nBeginTime;
+		LARGE_INTEGER nEndTime;
+		QueryPerformanceFrequency(&nFreq);
+		QueryPerformanceCounter(&nBeginTime);//开始计时 
+#endif
+		HuffmanDeCoding(argv[2], argv[3]);
+#if defined(_WIN32) || defined(_WIN64)
+		QueryPerformanceCounter(&nEndTime);//停止计时  
+		time = (double)(nEndTime.QuadPart - nBeginTime.QuadPart) / (double)nFreq.QuadPart;//计算程序执行时间单位为s  
+		printf("解压时间: %f ms\n", time * 1000);
+#else
+		printf("解压完成\n");
+#endif
+	}
+	else {
+		printf("usage : 'program -e srcfilename destfilename' encoding file\n"
+			"        'program -d srcfilename destfilename' decoding file\n");
+	}
+}
+int main(int argc,char * argv[])
+{
+	huffman(argc, argv);
+	return 0;
 //	cmpfile("D:\\downloads\\MediaCreationTool1909.exe", "D:\\downloads\\qMediaCreationTool1909-1.exe");
-	getchar();
+
 }

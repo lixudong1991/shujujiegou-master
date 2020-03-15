@@ -230,6 +230,7 @@ int convertstr(char* dest, int *size,char* str,int len)
 		dest[i] |= str[temp + 6] << 1;
 		dest[i] |= str[temp + 7];
 	}
+
 	for (int j = 0; j < m % 8; j++)
 	{
 		dest[i] |= str[sum * 8 + j] << (7 - j);

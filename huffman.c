@@ -337,6 +337,7 @@ int HuffmanDeCoding(const char* filename, const char* outfile)
 				m++;
 				currTreeIndex = head.tree[0].parent;
 			}
+
 			if ((test<<b)&ch)
 			{
 				currTreeIndex = head.tree[currTreeIndex].rchild;

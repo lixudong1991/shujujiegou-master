@@ -353,5 +353,4 @@ int main(int argc,char * argv[])
 	huffman(argc, argv);
 	return 0;
 //	cmpfile("D:\\downloads\\MediaCreationTool1909.exe", "D:\\downloads\\qMediaCreationTool1909-1.exe");
-
 }

@@ -519,7 +519,7 @@ static void RBDeleteFixup(RBTree* tree, RBNode* T)
 static PRBNode RBdeleteElem(RBTree* tree,PRBNode* T)
 {
 	if (!tree)
-		return;
+		return NULL;
 	PRBNode q = *T,ret=q;
 	PRBNode s = NULL;
 	int color = q->color;

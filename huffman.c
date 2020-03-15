@@ -277,7 +277,6 @@ int HuffmanDeCoding(const char* filename, const char* outfile)
 	int m = 0,realen=0,finish=0,index=0, readstatus=0;
 	int currTreeIndex = head.tree[0].parent;
 	fileSeek(pFile, sizeof(HuffmanFileHead), SEEK_SET);
-
 	while (1)
 	{
 		if (realen == 0)

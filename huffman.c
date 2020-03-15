@@ -2,6 +2,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include<string.h>
+#if defined(__linux__) || defined(__unix__)
+#define _FILE_OFFSET_BITS 64
+#endif
+static inline int fileSeek(FILE *file,long long offs,int o)
+{
+#if defined(_WIN32) || defined(_WIN64)
+#if _MSC_VER >= 1400
+	return _fseeki64(file, (long long)(offs), o);
+#else
+#error Visual Studio version is less than 8.0(VS 2005) !
+#endif
+#else
+	return fseeko(file, (long long)(offs), o);
+#endif
+}
+static inline long long fileTell(FILE* file)
+{
+#if defined(_WIN32) || defined(_WIN64)
+#if _MSC_VER >= 1400
+	return _ftelli64(file);
+#else
+#error Visual Studio version is less than 8.0(VS 2005) !
+#endif
+#else
+	return ftello(file);
+#endif
+}
+
+
 static void findMinNode(HTN *HT, int end, int* l, int* r)
 {
 	unsigned int w1 = 0xffffffff, w2 = 0xffffffff;
@@ -23,34 +52,7 @@ static void findMinNode(HTN *HT, int end, int* l, int* r)
 			}
 		}
 	}
-}
-
- static int readbuff(unsigned char *buff,int len,FILE *file,unsigned long long filesize,unsigned char *ret)
-{
-	 static int realen = 0,index=0,finish=0;
-	 static unsigned long long sumlen = 0;
-	if (realen==0)
-	{
-		if (finish)
-		{
-			return 1;
-		}
-		memset(buff, 0, len);
-		index = 0;
-		realen = fread(buff, sizeof(char), len, file);
-		if (realen< len)
-		{
-			if (realen + sumlen < filesize)
-				return -1;
-			else
-				finish = 1;
-		}
-		sumlen += realen;
-	}
-	realen--;
-	*ret = buff[index++];
-	return 0;
-}
+}/*
  static int convertCodestr(char* dest, char* str, int len)
  {
 	 int m = len;
@@ -74,7 +76,7 @@ static void findMinNode(HTN *HT, int end, int* l, int* r)
 		 dest[i] |= str[sum * 8 + j] << (7 - j);
 	 }
 	 return sub_zero;
- }
+ }*/
 int  HuffmanEnCoding(const char* filename, const char* outfile)
 {
 
@@ -84,20 +86,21 @@ int  HuffmanEnCoding(const char* filename, const char* outfile)
 	FILE* pFile = fopen(filename, "rb");
 	if (!pFile)
 		return -1;
-	unsigned char buff[4096];
-	unsigned long long len = 0, size =0;
-	fseek(pFile, 0, SEEK_SET);
+	unsigned char buff[8192];
+	unsigned long long len = 0, size = 0, size1 = 0;
+
+	fileSeek(pFile, 0, SEEK_SET);
 	while (1)
 	{
-		memset(buff, 0, 4096);
-		len = fread(buff, sizeof(char), 4096, pFile);
+		memset(buff, 0, 8192);
+		len = fread(buff, sizeof(char), 8192, pFile);
 		size += len;
 		for (int i = 0; i < len; i++)
 			head.tree[buff[i] + 1].weight++;
-		if (len < 4096)
+		if (len < 8192)
 			break;
 	}
-	printf("read size: %llu \n",size);
+	printf("read size: %llu \n", size);
 	int sum = 0;
 	for (int i=1;i<257;i++)
 	{
@@ -123,7 +126,6 @@ int  HuffmanEnCoding(const char* filename, const char* outfile)
 	CodeStr code[256];
 	memset(code, 0, sizeof(CodeStr) * 256);
 	char* cd = malloc(256* sizeof(char));
-	cd[255] = '\0';
 	unsigned int start;
 	for (int index = 1; index < 257; index++)
 	{
@@ -142,77 +144,40 @@ int  HuffmanEnCoding(const char* filename, const char* outfile)
 		memcpy(code[index - 1].str, cd + start, 256- start);
 	}
 	free(cd);
-	for (int i=0;i<256;i++)
+/*	for (int i=0;i<256;i++)
 	{
 		if (head.tree[i+1].weight>0)
 		{
 			convertCodestr(head.code[i].dat,code[i].str,code[i].len);
 			head.code[i].len = code[i].len;
 		}
-	}
-	FILE* pFileout = fopen(outfile, "w");
+	}*/
+	FILE* pFileout = fopen(outfile, "wb");
 	if (!pFileout)
 	{
 		return -2;
 	}
-/*	fwrite("HUFFMANC0000000000000000",1,8, pFileout);
-	for (size_t i = 0; i < 512; i++)
-	{
-		fwrite(&tree[i], sizeof(NTNode), 1, pFileout);
-	}*/
-	head.sub_zero = 7;
-	fseek(pFileout, 0, SEEK_SET);
-	fwrite(&head, 1, sizeof(HuffmanFileHead), pFileout);
-#if 0
-	fseek(pFile, 0, SEEK_SET);
-	fseek(pFileout, sizeof(HuffmanFileHead),SEEK_SET);
+	fileSeek(pFile, 0, SEEK_SET);
+	fileSeek(pFileout, sizeof(HuffmanFileHead),SEEK_SET);
 	unsigned char codedata[1024];
 	char *codestr = malloc(8192);
+	memset(codestr,0,8192);
 	memset(codedata, 0, 1024);
 	unsigned char ch = 0;
-	int m = 0;
-	char sub_zero = 0;;
+	int m = 0,index=0,realen=0,finish=0;
+	char sub_zero = 0;
+
 	while (1)
 	{
-		int readstatus = 0; 
-		if ((readstatus = readbuff(buff, 4096, pFile, size, &ch)) < 0)
-			return -1;
-		if (readstatus == 1)
+		if (realen == 0)
 		{
-			sub_zero = 8 - (m % 8);
-			memset(codedata, 0, 1024);
-			sum = m / 8;
-			int i = 0;
-			for (i = 0; i < sum; i++)
+			if (finish)
 			{
-				int temp = i * 8;
-				codedata[i] |= codestr[temp] << 7;
-				codedata[i] |= codestr[temp + 1] << 6;
-				codedata[i] |= codestr[temp + 2] << 5;
-				codedata[i] |= codestr[temp + 3] << 4;
-				codedata[i] |= codestr[temp + 4] << 3;
-				codedata[i] |= codestr[temp + 5] << 2;
-				codedata[i] |= codestr[temp + 6] << 1;
-				codedata[i] |= codestr[temp + 7];
-			}
-			for (int j=0;j<m%8;j++)
-			{
-				codedata[i] |= codestr[sum * 8 + j] << (7 - j);
-			}
-			fwrite(codedata, 1, (sub_zero==0?sum:sum+1), pFileout);
-			fflush(pFileout);
-			head.sub_zero = sub_zero;
-			fseek(pFileout, 0, SEEK_SET);
-			fwrite(&head, sizeof(HuffmanFileHead), 1, pFileout);
-			fflush(pFileout);
-			break;
-		}
-		else {
-			if (code[ch].len+m>8192)
-			{
-				memcpy(codestr+m,code[ch].str,8192-m);
+				sub_zero = 8 - (m % 8);
 				memset(codedata, 0, 1024);
-				for (int i = 0; i <1024 ; i++)
+				sum = m / 8;
+				int i = 0;
+				for (i = 0; i < sum; i++)
 				{
 					int temp = i * 8;
 					codedata[i] |= codestr[temp] << 7;
@@ -224,19 +189,62 @@ int  HuffmanEnCoding(const char* filename, const char* outfile)
 					codedata[i] |= codestr[temp + 6] << 1;
 					codedata[i] |= codestr[temp + 7];
 				}
-				fwrite(codedata, 1, 1024, pFileout);
+				for (int j = 0; j < m % 8; j++)
+				{
+					codedata[i] |= codestr[sum * 8 + j] << (7 - j);
+				}
+				fwrite(codedata, 1, (sub_zero == 0 ? sum : sum + 1), pFileout);
 				fflush(pFileout);
-				memset(codestr,0,8192);
-				m = code[ch].len - (8192 - m);
-				memcpy(codestr,code[ch].str+(8192-m),m);
+				head.sub_zero = sub_zero;
+				fileSeek(pFileout, 0, SEEK_SET);
+				fwrite(&head, sizeof(HuffmanFileHead), 1, pFileout);
+				fflush(pFileout);
+				break;
 			}
-			else {
-				memcpy(codestr+m,code[ch].str,code[ch].len);
-				m += code[ch].len;
+			memset(buff, 0, 8192);
+			index = 0;
+			realen = fread(buff, sizeof(char), 8192, pFile);
+			if (ferror(pFile))
+			{
+				break;
 			}
+			if (feof(pFile))
+			{
+				finish = 1;
+			}
+
+		}
+		
+		realen--;
+		ch = buff[index++];
+		if (code[ch].len+m>8192)
+		{
+			int tem = 8192 - m;
+			memcpy(codestr+m,code[ch].str, tem);
+			memset(codedata, 0, 1024);
+			for (int i = 0; i <1024 ; i++)
+			{
+				int temp = i * 8;
+				codedata[i] |= codestr[temp] << 7;
+				codedata[i] |= codestr[temp + 1] << 6;
+				codedata[i] |= codestr[temp + 2] << 5;
+				codedata[i] |= codestr[temp + 3] << 4;
+				codedata[i] |= codestr[temp + 4] << 3;
+				codedata[i] |= codestr[temp + 5] << 2;
+				codedata[i] |= codestr[temp + 6] << 1;
+				codedata[i] |= codestr[temp + 7];
+			}
+			fwrite(codedata, 1, 1024, pFileout);
+			fflush(pFileout);
+			memset(codestr,0,8192);
+			m = code[ch].len - (8192 - m);
+			memcpy(codestr,code[ch].str+ tem,m);
+		}
+		else {
+			memcpy(codestr+m,code[ch].str,code[ch].len);
+			m += code[ch].len;
 		}
 	}
-#endif
 	fclose(pFile);
 	fclose(pFileout);
 	return 0;
@@ -244,15 +252,101 @@ int  HuffmanEnCoding(const char* filename, const char* outfile)
 
 int HuffmanDeCoding(const char* filename, const char* outfile)
 {
-	HuffmanFileHead head;
+	HuffmanFileHead head ;
 	memset(&head,0,sizeof(HuffmanFileHead));
+
 	FILE* pFile = fopen(filename, "rb");
 	if (!pFile)
 		return - 1;
-	fseek(pFile, 0, SEEK_SET);
-
+	FILE* pFileout = fopen(outfile, "wb");
+	if (!pFileout)
+		return -1;
+	unsigned long long size = 0,size1=0;
+	fileSeek(pFile, 0, SEEK_END);
+	size = fileTell(pFile);
+	fileSeek(pFile, 0, SEEK_SET);
+	fileSeek(pFileout, 0, SEEK_SET);
 	int headsize = fread(&head, 1, sizeof(HuffmanFileHead), pFile);
+	if (memcmp(head.head, "HUFFMAN", 7) != 0)
+		return -1;
+	
+	unsigned char buff[8192];
+	unsigned char databuff[8192];
+	memset(databuff, 0, 8192);
+	unsigned char ch=0;
+	int m = 0,realen=0,finish=0,index=0, readstatus=0;
+	int currTreeIndex = head.tree[0].parent;
+	fileSeek(pFile, sizeof(HuffmanFileHead), SEEK_SET);
+
+	while (1)
+	{
+		if (realen == 0)
+		{
+			if (finish)
+			{
+				currTreeIndex = head.tree[0].parent;
+				char test = 1;
+				for (int i = head.sub_zero; i > 0; i--)
+				{
+					if (head.tree[currTreeIndex].lchild == 0 && head.tree[currTreeIndex].rchild == 0)
+					{
+						m--;
+						currTreeIndex = head.tree[0].parent;
+					}
+					if ((test << i) & ch)
+					{
+						currTreeIndex = head.tree[currTreeIndex].rchild;
+					}
+					else {
+						currTreeIndex = head.tree[currTreeIndex].lchild;
+					}
+				}
+				fwrite(databuff, 1, m, pFileout);
+				fflush(pFileout);
+				break;
+			}
+			memset(buff, 0, 8192);
+			index = 0;
+			realen = fread(buff, sizeof(char), 8192, pFile);
+			if (ferror(pFile))
+			{
+				break;
+			}
+			if (feof(pFile))
+			{
+				finish = 1;
+			}
+
+		}
+
+		realen--;
+		ch = buff[index++];
+		char test = 1;
+		for (int b=7;b>=0;b--)
+		{
+			if (head.tree[currTreeIndex].lchild == 0 && head.tree[currTreeIndex].rchild == 0)
+			{
+				if (m >= 8192)
+				{
+					fwrite(databuff, 1, m, pFileout);
+					fflush(pFileout);
+					m = 0;
+					memset(databuff, 0, 8192);
+				}
+				databuff[m] = currTreeIndex-1;				    
+				m++;
+				currTreeIndex = head.tree[0].parent;
+			}
+			if ((test<<b)&ch)
+			{
+				currTreeIndex = head.tree[currTreeIndex].rchild;
+			}
+			else {
+				currTreeIndex = head.tree[currTreeIndex].lchild;
+			}
+		}
+	}
 	fclose(pFile);
-//	fclose(pFileout);
+	fclose(pFileout);
 	return 0;
 }

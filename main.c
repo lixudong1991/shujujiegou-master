@@ -244,9 +244,64 @@ void testconvertstr()
 	int len = 1024;
 	printf("subzero: %d \n", convertstr(code, &len, str, 26));
 }
+int cmpfile(const char* file, const char* file1)
+{
+	FILE* pFile = fopen(file, "rb");
+	if (!pFile)
+		return -1;
+	FILE* pFile1 = fopen(file1, "rb");
+	if (!pFile1)
+		return -1;
+	char buff[4096];
+	char buff1[4096];
+	int len = 0, len1 = 0;
+	long long size = 0;
+	while (1)
+	{
+		memset(buff,0,4096);
+		memset(buff1, 0, 4096);
+		len = fread(buff, 1, 4096, pFile);
+		len1 = fread(buff1, 1, 4096, pFile1);
+		if (len!=len1)
+		{
+
+			return -1;
+		}
+		for (int i=0;i<len;i++)
+		{
+			char c = buff[i], c1 = buff1[i];
+			if (c!=c1)
+			{
+				//fclose(pFile);
+				//fclose(pFile1);
+				//return size + i;
+				printf("aaa : %d\n", i);
+			}
+		}
+		size += len;
+		if (len<4096)
+		{
+			fclose(pFile);
+			fclose(pFile1);
+			return 0;
+		}
+	}
+
+}
 int main()
 {
-	HuffmanEnCoding("D:\\downloads\\MediaCreationTool1909.exe","D:\\downloads\\qMediaCreationTool1909");
-	HuffmanDeCoding("D:\\downloads\\qMediaCreationTool1909", "D:\\downloads\\qMediaCreationTool1909-1.exe");
+	double time = 0;
+	LARGE_INTEGER nFreq;
+	LARGE_INTEGER nBeginTime;
+	LARGE_INTEGER nEndTime;
+	QueryPerformanceFrequency(&nFreq);
+	QueryPerformanceCounter(&nBeginTime);//开始计时  
+	//HuffmanEnCoding("D:\\downloads\\MediaCreationTool1909.exe","D:\\downloads\\MediaCreationTool1909");
+	HuffmanDeCoding("D:\\downloads\\MediaCreationTool1909","D:\\downloads\\MediaCreationTool1909-1.exe");
+	QueryPerformanceCounter(&nEndTime);//停止计时  
+	time = (double)(nEndTime.QuadPart - nBeginTime.QuadPart) / (double)nFreq.QuadPart;//计算程序执行时间单位为s  
+	printf("运行时间: %f ms", time * 1000);
+
+//	cmpfile("D:\\downloads\\MediaCreationTool1909.exe", "D:\\downloads\\qMediaCreationTool1909-1.exe");
 	getchar();
 }

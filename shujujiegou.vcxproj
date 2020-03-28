@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BiTree.h" />
+    <ClInclude Include="B_tree.h" />
     <ClInclude Include="head.h" />
     <ClInclude Include="huffman.h" />
     <ClInclude Include="linklist.h" />
@@ -152,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BiTree.c" />
+    <ClCompile Include="B_tree.c" />
     <ClCompile Include="huffman.c" />
     <ClCompile Include="linklist.c" />
     <ClCompile Include="listtest.c" />

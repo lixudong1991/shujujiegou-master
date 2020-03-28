@@ -1,7 +1,7 @@
 #ifndef B_TREE_H_
 #define B_TREE_H_
 #include "head.h"
-#define m 3  //B树的阶，暂设为3
+#define BTREE_M 3  //B树的阶，暂设为3
 typedef int KeyType;
 typedef char Record;
 
@@ -9,9 +9,9 @@ typedef struct BTNode
 {
 	int				keynum;//结点中关键字的个数，即结点的大小
 	struct BTNode	*parent;//指向双亲结点
-	KeyType			key[m + 1];//关键字向量,0号单元未使用
-	struct BTNode	*ptr[m + 1];//子树指针向量
-	Record			*recptr[m + 1];//记录指针向量//0号单元未使用
+	KeyType			key[BTREE_M + 1];//关键字向量,0号单元未使用
+	struct BTNode	*ptr[BTREE_M + 1];//子树指针向量
+	Record			*recptr[BTREE_M + 1];//记录指针向量//0号单元未使用
 }BTNode,*BTree;
 
 typedef struct {
@@ -29,7 +29,7 @@ Result SearchBTree(BTree T, KeyType K);
 在m阶B树T上结点*q的key[i]和key[i+1]之间插入关键字K,
 若引起结点过大，则沿双亲链进行必要的结点分裂调整，使T仍是m阶B树
 */
-Status InsertBTree(BTree* T, KeyType K, BTree q, int i);
+Status InsertBTree(BTree* T, KeyType K, Record* rec);
 #endif // !1
 
 

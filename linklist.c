@@ -103,5 +103,5 @@ Status ListInsert_DuL(DuLinkList L, int i, ElemType e)
 }
 Status ListDelete_DuL(DuLinkList L, int i, ElemType* e)
 {
-
+	return FALSE;
 }

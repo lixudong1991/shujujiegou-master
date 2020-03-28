@@ -7,6 +7,7 @@
 #include "BiTree.h"
 #include "SearchAlgorithm.h"
 #include "SqStack.h"
+#include "B_tree.h"
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>  
 #endif
@@ -215,13 +216,27 @@ void RBTreeTest()
 	printf("\n");
 	//RBTreeTraverse(tree, visit);
 }
+//BÊ÷²âÊÔ
+void B_treeTest()
+{
+	BTree tree=NULL;
+	char* rec[26] = { "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
+	for (int i=0;i<26;i++)
+	{
+		InsertBTree(&tree, i+1, rec[i]);
+	}
+
+}
+
+
+
 #include"huffman.h"
 int convertstr(char* dest, int *size,char* str,int len)
 {
-	int m = len;
-	int sub_zero = 8 - (m % 8);
+	int n = len;
+	int sub_zero = 8 - (n % 8);
 	memset(dest, 0, *size);
-	int sum = m / 8;
+	int sum = n / 8;
 	int i = 0;
 	for (i = 0; i < sum; i++)
 	{
@@ -236,7 +251,7 @@ int convertstr(char* dest, int *size,char* str,int len)
 		dest[i] |= str[temp + 7];
 	}
 
-	for (int j = 0; j < m % 8; j++)
+	for (int j = 0; j < n % 8; j++)
 	{
 		dest[i] |= str[sum * 8 + j] << (7 - j);
 	}
@@ -350,7 +365,7 @@ void huffman(int argc, char* argv[])
 }
 int main(int argc,char * argv[])
 {
-	huffman(argc, argv);
+
+	B_treeTest();
 	return 0;
-//	cmpfile("D:\\downloads\\MediaCreationTool1909.exe", "D:\\downloads\\qMediaCreationTool1909-1.exe");
 }

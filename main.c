@@ -366,7 +366,9 @@ void huffman(int argc, char* argv[])
 }
 int main(int argc,char * argv[])
 {
-	ui64 a = 21, b = 30;
-	printf("%llu 和 %llu 的最大公约数是 %llu\n",a,b,gcd(a, b));
+	ui64 a = 99, b = 78;
+	GcdResult res;
+	gcd_Result(a, b, &res);
+	printf("%llu 和 %llu 的最大公约数是 %llu, 参数是 %lld,%lld\n",a,b, res.d,res.x,res.y);
 	return 0;
 }

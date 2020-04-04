@@ -1,7 +1,7 @@
 #ifndef B_TREE_H_
 #define B_TREE_H_
 #include "head.h"
-#define BTREE_M 3  //B树的阶，暂设为3
+#define BTREE_M 6  //B树的阶，暂设为3
 typedef int KeyType;
 typedef char Record;
 

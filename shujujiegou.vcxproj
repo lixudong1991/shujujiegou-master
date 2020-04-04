@@ -147,6 +147,7 @@
     <ClInclude Include="linklist.h" />
     <ClInclude Include="listtest.h" />
     <ClInclude Include="Mystr.h" />
+    <ClInclude Include="NumberAlg.h" />
     <ClInclude Include="SearchAlgorithm.h" />
     <ClInclude Include="sort.h" />
     <ClInclude Include="SqStack.h" />
@@ -159,6 +160,7 @@
     <ClCompile Include="listtest.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Mystr.c" />
+    <ClCompile Include="NumberAlg.c" />
     <ClCompile Include="SearchAlgorithm.c" />
     <ClCompile Include="sort.c" />
     <ClCompile Include="SqStack.c" />

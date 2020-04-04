@@ -8,6 +8,7 @@
 #include "SearchAlgorithm.h"
 #include "SqStack.h"
 #include "B_tree.h"
+#include "NumberAlg.h"
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>  
 #endif
@@ -365,7 +366,7 @@ void huffman(int argc, char* argv[])
 }
 int main(int argc,char * argv[])
 {
-
-	B_treeTest();
+	ui64 a = 21, b = 30;
+	printf("%llu 和 %llu 的最大公约数是 %llu\n",a,b,gcd(a, b));
 	return 0;
 }

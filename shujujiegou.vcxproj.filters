@@ -45,6 +45,9 @@
     <ClInclude Include="B_tree.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="NumberAlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="listtest.c">
@@ -75,6 +78,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="B_tree.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NumberAlg.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

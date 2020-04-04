@@ -29,16 +29,12 @@ Result SearchBTree(BTree T, KeyType K)
 			p = p->ptr[i];
 		}
 	}
-	Result ret;
-	ret.pt = q;
-	ret.index = i;
-	ret.tag = 0;
+	Result ret = {q,i,0};
 	if (found)
 	{
 		ret.pt = p;
 		ret.tag = 1;
 	}
-
 	return ret;
 }
 

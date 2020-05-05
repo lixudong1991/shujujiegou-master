@@ -364,11 +364,55 @@ void huffman(int argc, char* argv[])
 			"        'program -d srcfilename destfilename' decoding file\n");
 	}
 }
+/*
+求解模线性方程测试
+*/
+void testmodule_linerar()
+{
+
+	ui64 a = 35, n = 50, b = 10;
+	ui64* ret = NULL;
+	ui64 size = modular_linear_equation_solver(a, b, n, &ret);
+	for (ui64 i = 0; i < size; i++)
+	{
+		printf("%llu  ", ret[i]);
+	}
+}
+/*
+	反复平方法求 a^b mod n,a>=0,b>=0,n>0;测试
+*/
+void test_modular_exponentiation()
+{
+	ui64 a = 2, b = 64, n = 3;
+	ui64 ret = modular_exponentiation(a, b, n);
+	printf("%llu\n", ret);
+}
+/*
+伪素数测试
+*/
+void testpseudoprime()
+{
+	ui64 n = 1105;
+	if (pseudoprime(n))
+		printf("%llu 是素数\n", n);
+	else
+		printf("%llu 不是素数\n", n);
+}
+
 int main(int argc,char * argv[])
 {
-	ui64 a = 4546976466968, b = 546546667;
-	GcdResult res;
-	gcd_Result(a, b, &res);
-	printf("%llu 和 %llu 的最大公约数是 %llu, 参数是 %lld,%lld\n",a,b, res.d,res.x,res.y);
+	//ui64 n = 42785462155424371;
+	ui64 n = 4278546215542441;
+	//ui64 n = 1;
+	if (pseudoprime(n))
+		printf("%llu 是素数\n", n);
+	else
+		printf("%llu 不是素数\n", n);
+
+	if (miller_rabin(n,10))
+		printf("%llu 是素数\n", n);
+	else
+		printf("%llu 不是素数\n", n);
+
 	return 0;
 }

@@ -1,9 +1,9 @@
 #ifndef NUMBERALG_H_H_
 #define NUMBERALG_H_H_
-
+#include "gmp.h"
 typedef	unsigned long long ui64;
 typedef	long long i64;
-
+#define MAX_BIT_INDEX 1023
 /*
 	欧几里得算法求a,b的最大公约数gcd(a,b)
 	欧几里得定理 gcd(a,b)=gcd(b,a mod b);
@@ -29,7 +29,7 @@ ui64 modular_linear_equation_solver(ui64 a, ui64 b, ui64 n,i64** ret);
 /*
 	反复平方法求 a^b mod n,a>=0,b>=0,n>0;
 */
-ui64 modular_exponentiation(ui64 a, ui64 b, ui64 n);
+void modular_exponentiation(mpz_t* a, mpz_t* b, mpz_t* n, mpz_t* d);
 
 /*
 伪素数测试
@@ -39,7 +39,7 @@ int pseudoprime(ui64 n);
 /*
 	MILLE-RABIN素数测试 n待测试的数，s测试的次数
 */
-int miller_rabin(ui64 n, ui64 s);
+int miller_rabin(mpz_t* n, ui64 s);
 
 #endif // !NUMBERALG_H_H_
 

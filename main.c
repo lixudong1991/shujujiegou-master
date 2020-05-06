@@ -384,8 +384,8 @@ void testmodule_linerar()
 void test_modular_exponentiation()
 {
 	ui64 a = 2, b = 64, n = 3;
-	ui64 ret = modular_exponentiation(a, b, n);
-	printf("%llu\n", ret);
+	//ui64 ret = modular_exponentiation(a, b, n);
+//	printf("%llu\n", ret);
 }
 /*
 伪素数测试
@@ -404,7 +404,7 @@ int main(int argc,char * argv[])
 	//ui64 n = 42785462155424371;
 	ui64 n = 4278546215542441;
 	//ui64 n = 1;
-	if (pseudoprime(n))
+	/*if (pseudoprime(n))
 		printf("%llu 是素数\n", n);
 	else
 		printf("%llu 不是素数\n", n);
@@ -413,6 +413,6 @@ int main(int argc,char * argv[])
 		printf("%llu 是素数\n", n);
 	else
 		printf("%llu 不是素数\n", n);
-
+*/
 	return 0;
 }

@@ -369,14 +369,14 @@ void huffman(int argc, char* argv[])
 */
 void testmodule_linerar()
 {
-
+/*
 	ui64 a = 35, n = 50, b = 10;
 	ui64* ret = NULL;
 	ui64 size = modular_linear_equation_solver(a, b, n, &ret);
 	for (ui64 i = 0; i < size; i++)
 	{
 		printf("%llu  ", ret[i]);
-	}
+	}*/
 }
 /*
 	反复平方法求 a^b mod n,a>=0,b>=0,n>0;测试
@@ -401,18 +401,66 @@ void testpseudoprime()
 
 int main(int argc,char * argv[])
 {
-	//ui64 n = 42785462155424371;
-	ui64 n = 4278546215542441;
-	//ui64 n = 1;
-	/*if (pseudoprime(n))
-		printf("%llu 是素数\n", n);
+	RsaKey prikey, pubkey;
+	mpz_init_set_ui(prikey.val, 0);
+	mpz_init_set_ui(prikey.n, 0);
+	mpz_init_set_ui(pubkey.val, 0);
+	mpz_init_set_ui(pubkey.n, 0);
+	if (createKey(&prikey, &pubkey))
+	{
+		printf("创建key成功\n");
+	}
 	else
-		printf("%llu 不是素数\n", n);
+		printf("创建key失败\n");
 
-	if (miller_rabin(n,10))
-		printf("%llu 是素数\n", n);
+	printf("prikey d = %s\n", mpz_get_str(NULL, 16, prikey.val));
+	printf("prikey n = %s\n", mpz_get_str(NULL, 16, prikey.n));
+	printf("pubkey e = %s\n", mpz_get_str(NULL, 16, pubkey.val));
+	printf("pubkey n = %s\n", mpz_get_str(NULL, 16, pubkey.n));
+	char* message = "373057086";
+
+	mpz_t ecode, dcode,mess;
+	mpz_init_set_ui(ecode, 0);
+	mpz_init_set_ui(dcode, 3);
+	mpz_init_set_str(mess, message,10);
+	mpz_powm(ecode, mess, pubkey.val,pubkey.n);
+	printf("加密后的消息= %s\n", mpz_get_str(NULL, 16, ecode));
+	mpz_powm(dcode, ecode, prikey.val, prikey.n);
+	printf("解密后的消息= %s\n", mpz_get_str(NULL, 10, dcode));
+
+	/*
+	mpz_t n;
+	mpz_init_set_str(n, "a337836a31f574713f1bfb972b967fcb23a6f916130c9ab31bad3201bc7efbadefd4bdd1c3ca067fe9096466e5883efe5e71456c5e78bc403b45c52152e13c05876f0170eabc0adfecf6d31b0b0b6b0971aa017d54ac5dd7a527e58b5d515b035b377d7a307799bba375d25ba18ffede166f6845f09ae7ddccb053c409244a69", 16);
+	if (miller_rabin(&n, 10))
+	{
+		printf("是素数\n");
+	}
 	else
-		printf("%llu 不是素数\n", n);
+		printf("不是素数\n");
+	mpz_init_set_str(n, "e0383dcdd78f9d8fb3978b346f999a95f0ed8fbcde4aa9b230ee7f518a46d6d12cc79e922772fdcc1ffd6bd783b2ff42049edae5c0ad70ed1231885ad9e397e0cd8f861d5c5828db945f77bde479718b21fb3759b0e846c349a51dd3a408c2d7826900189baef63127c649f8be0b904483a93f05cdc885d7aa86d3b0e91a51c5", 16);
+	if (miller_rabin(&n, 10))
+	{
+		printf("是素数\n");
+	}
+	else
+		printf("不是素数\n");
+	mpz_init_set_str(n, "8ef46e8922256d5b50ad8a3b72b369af3eafb92ff65ad7d2602d72d796e299895df53c4e1e1a71ddb104586ee27f59648ea875d481049555919a9cc38d2481e225f573c231186483771666ee1848fc9bfec1bda6d8e1781edc58d5a3600271f6f4f60a6476e315c29c81b0994d4188a866d27433a32a77a573286cdda9cdb4e0e4405daacaccdaac40443b78a324db8d78f4a08add04a3af567c9a225c680ff8d358c7263411548ef734a1526beacaff647fbbb4e8c1ff08158230b8984712d15f4c5959c3fb738889022d0352d74ad2c0ac7b7dbd256971900542636e9ab432b8af5dad8aa52c5674d79a1676419b2168dcf1366a82f97f1baa2558a4227bcd", 16);
+	if (miller_rabin(&n, 10))
+	{
+		printf("是素数\n");
+	}
+	else
+		printf("不是素数\n");
 */
+	/*
+	mpz_t a, b, n,val;
+	mpz_init_set_ui(a,3);
+	mpz_init_set_ui(b,1);
+	mpz_init_set_ui(n,17);
+	mpz_init_set_ui(val,0);
+	if (modular_linear_equation_solver(a, b, n, &val, 0))
+		printf("val= %s", mpz_get_str(NULL, 10, val));
+	else
+		printf("不存在");*/
 	return 0;
 }

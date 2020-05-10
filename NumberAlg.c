@@ -20,28 +20,78 @@ ui64 gcd(ui64 a, ui64 b)
 	return a;
 }
 
-void gcd_Result(ui64 a, ui64 b, GcdResult* res)
+void gcd_Result(mpz_t a, mpz_t b, GcdResult* res)
 {
-
-	if (b == 0)
+	mpz_t c, d, e, x1, y1;
+	mpz_init(c);
+	mpz_init(d);
+	mpz_init(e);
+	mpz_init(x1);
+	mpz_init(y1);
+	mpz_set(d, b);
+	if (mpz_cmp_ui(d, 0) == 0)
 	{
-		res->d = a;
-		res->x = 1;
-		res->y = 0;
+		// res->d = a;
+		mpz_set(res->d, a);
+		// res->x = 1;
+		mpz_set_ui(res->x, 1);
+		//res->y = 0;
+		mpz_set_ui(res->y, 0);
 	}
 	else
 	{
-	    gcd_Result(b, a % b,res);
-		i64 x1 = res->x, y1 = res->y;
-		res->x = y1;
-		res->y = x1 - a / b * y1;
+		mpz_mod(e, a, b);
+		gcd_Result(d, e, res);
+		mpz_set(x1, res->x);
+		mpz_set(y1, res->y);
+		mpz_set(res->x, y1);
+		mpz_div(c, a, b);
+		mpz_mul(c, c, y1);
+		mpz_sub(res->y, x1, c);
 	}
+	mpz_clear(x1);
+	mpz_clear(y1);
+	mpz_clear(e);
+	mpz_clear(c);
+	mpz_clear(d);
 }
-
-ui64 modular_linear_equation_solver(ui64 a, ui64 b, ui64 n, i64** ret)
+int modular_linear_equation_solver(mpz_t a, mpz_t b, mpz_t n, mpz_t* ret,int m)
 {
 	GcdResult res;
+	mpz_init_set_ui(res.x, 0);
+	mpz_init_set_ui(res.y, 0);
+	mpz_init_set_ui(res.d, 0);
 	gcd_Result(n, a, &res);
+	mpz_t tmp,x0;
+	int r= 0;
+	mpz_init_set_ui(tmp, 0);
+	mpz_init_set_ui(x0, 0);
+	mpz_mod(tmp, b, res.d);
+	if (mpz_cmp_ui(tmp, 0) == 0)
+	{
+		printf("ÄæÔª=%s\n", mpz_get_str(NULL,16,res.y));
+		if (mpz_cmp_ui(res.y, 0) < 0)
+			mpz_add(res.y, res.y, n);
+		printf("ÄæÔª=%s\n", mpz_get_str(NULL, 16, res.y));
+		mpz_div(x0, b, res.d);
+		mpz_mul(x0, x0, res.y);
+		mpz_mod(x0, x0, n);
+		mpz_div(tmp, n, res.d);
+		mpz_mul_ui(tmp, tmp, m);
+		mpz_add(x0, x0, tmp);
+		mpz_mod(*ret, x0, n);
+		r= 1;
+	}
+	else
+		r= 0;
+
+	mpz_clear(tmp);
+	mpz_clear(x0);
+	mpz_clear(res.x);
+	mpz_clear(res.y);
+	mpz_clear(res.d);
+	return r;
+	/*
 	if (!(b % res.d))
 	{
 		if (res.y < 0)
@@ -53,7 +103,8 @@ ui64 modular_linear_equation_solver(ui64 a, ui64 b, ui64 n, i64** ret)
 		return res.d;
 	}
 	else
-	return 0;
+	return 0;*/
+	
 }
 
 void modular_exponentiation(mpz_t* a, mpz_t* b, mpz_t* n, mpz_t* d)
@@ -174,5 +225,78 @@ int miller_rabin(mpz_t* n, ui64 s)
 	}
 	mpz_clear(key);
 	mpz_clear(maxr);
+	return ret;
+}
+
+int createKey(RsaKey* prikey, RsaKey* pubkey)
+{
+	clock_t time = clock();
+	int ret = 0;
+	gmp_randstate_t grt;
+	gmp_randinit_default(grt);
+	gmp_randseed_ui(grt, time);
+	mpz_t p,q,base,n,maxv,nn,e,b,d;
+	mpz_init_set_ui(p,0);
+	mpz_init_set_ui(q, 0);
+	mpz_init_set_ui(base, 1);
+	mpz_init_set_ui(n, 0);
+	mpz_init_set_ui(maxv, 1);
+	mpz_init_set_ui(nn, 0);
+	mpz_init_set_ui(e, 3);
+	mpz_init_set_ui(d, 1);
+	mpz_init_set_ui(b, 1);
+	mpz_mul_2exp(base, base, MAX_BIT_INDEX);
+	mpz_mul_2exp(maxv, maxv, MAX_BIT_INDEX+1);
+k:	mpz_urandomm(p, grt, base);
+	if (mpz_even_p(p))
+		mpz_add_ui(p, p, 1);
+	if (mpz_cmp(p, base) < 0)
+		mpz_add(p, p, base);
+	while (!miller_rabin(&p, 10))
+	{
+		mpz_add_ui(p, p, 2);
+		if (mpz_cmp(p, maxv) >= 0)
+			goto k;
+	}
+k1:	mpz_urandomm(q, grt, base);
+	if (mpz_even_p(q))
+		mpz_add_ui(q, q, 1);
+	if (mpz_cmp(q, base) < 0)
+		mpz_add(q, q, base);
+	while (!miller_rabin(&q, 10))
+	{
+		mpz_add_ui(q, q, 2);
+		if (mpz_cmp(q, maxv) >= 0)
+			goto k1;
+	}
+	printf("p = %s\n", mpz_get_str(NULL, 16, p));
+	printf("q = %s\n", mpz_get_str(NULL, 16, q));
+	mpz_mul(n, p, q);
+	//printf("n = %s\n", mpz_get_str(NULL, 16, n));
+	mpz_sub_ui(p, p, 1);
+	mpz_sub_ui(q, q, 1);
+	mpz_mul(nn, p, q);
+	printf("nn = %s\n", mpz_get_str(NULL, 16, nn));
+	mpz_add_ui(p, p, 1);
+	mpz_add_ui(q, q, 1);
+
+	while (!modular_linear_equation_solver(e, b, nn, &d, 0))
+	{
+		mpz_add_ui(e, e, 2);
+	}	
+	mpz_set(pubkey->val, e);
+	mpz_set(pubkey->n, n);
+	mpz_set(prikey->val, d);
+	mpz_set(prikey->n, n);
+	ret = 1;
+	mpz_clear(p);
+	mpz_clear(q);
+	mpz_clear(base);
+	mpz_clear(n);
+	mpz_clear(maxv);
+	mpz_clear(nn);
+	mpz_clear(e);
+	mpz_clear(b);
+	mpz_clear(d);
 	return ret;
 }

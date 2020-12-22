@@ -105,3 +105,36 @@ Status ListDelete_DuL(DuLinkList L, int i, ElemType* e)
 {
 	return FALSE;
 }
+struct ListNode {
+	int val;
+	struct ListNode *next;
+};
+
+struct ListNode* reverseKGroup(struct ListNode* head, int k) {
+	struct ListNode *ret = head, **rnode= &ret,*fristnode= head,*tempnode;
+	if (k <= 1)
+		return head;
+	int rindex = 0;
+	while (fristnode)
+	{
+		tempnode = fristnode;
+		while (tempnode&&rindex <k)
+		{
+			tempnode = tempnode->next;
+			rindex++;
+		}	
+		if (rindex==0|| rindex!=k)
+			break;
+		while (rindex)
+		{
+		    tempnode= (*rnode)->next;
+			(*rnode) = tempnode;
+			rnode = &(tempnode->next);
+			tempnode->next = (*rnode);		
+			rindex--;
+		}
+		fristnode->next = (*rnode);
+		fristnode = (*rnode);
+	}
+	return ret;
+}

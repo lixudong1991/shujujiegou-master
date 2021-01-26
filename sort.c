@@ -35,33 +35,50 @@ void quicksort(int* arr, int len)
 
 void mqsort(int arr[],int length)
 {
-	int *buff=malloc(sizeof(int)*2*length);
-	int count=1,index,temp,tem,key;
-	buff[0]=0;
-	buff[1]=length-1;
-	for(int i=0;i<count;i++)
-	{
-		temp=buff[i*2+1];
-		if(buff[i]==temp)
-			continue;
-		index=buff[i]-1;
-		key=arr[temp];
-		for(int j=buff[i];j<temp;j++)
-		{
-			if(arr[j]<=key)
-			{
-				++index;
-				if(index!=j&&arr[j]!=key)
-				{
-					tem=arr[j];
-					arr[j]=arr[index];
-					arr[index]=tem;
-				}
-			}
-		}
-		arr[temp]=arr[++index];
-		arr[index]=key;
-		
-	}
-		
+	    int* buff = malloc(sizeof(int) * 2 * length), * buff1 = malloc(sizeof(int) * 2 * length), buff2 = NULL;
+    int count, index, temp, tem, key, q = 1;
+    buff[0] = 0;
+    buff[1] = length - 1;
+    while (q)
+    {
+        count = q;
+        q = 0;
+        for (int i = 0; i < count; i++)
+        {
+            temp = buff[i * 2 + 1];
+            index = buff[i] - 1;
+            key = arr[temp];
+            for (int j = buff[i]; j < temp; j++)
+            {
+                if (arr[j] <= key)
+                {
+                    ++index;
+                    if (index != j && arr[index] != key)
+                    {
+                        tem = arr[j];
+                        arr[j] = arr[index];
+                        arr[index] = tem;
+                    }
+                }
+            }
+            arr[temp] = arr[++index];
+            arr[index] = key;
+            if (buff[i] < index - 1)
+            {
+                buff1[q++] = buff[i];
+                buff1[q++] = index - 1;
+            }
+            if (index + 1 < temp)
+            {
+                buff1[q++] = index + 1;
+                buff1[q++] = temp;
+            }
+        }
+        q /= 2;
+        buff2 = buff;
+        buff = buff1;
+        buff1 = buff2;
+    }
+    free(buff1);
+    free(buff);
 }

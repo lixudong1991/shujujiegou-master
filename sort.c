@@ -35,7 +35,7 @@ void quicksort(int* arr, int len)
 
 void mqsort(int arr[],int length)
 {
-	    int* buff = malloc(sizeof(int) * 2 * length), * buff1 = malloc(sizeof(int) * 2 * length), buff2 = NULL;
+    int* buff = malloc(sizeof(int) * 2 * length), * buff1 = malloc(sizeof(int) * 2 * length), buff2 = NULL;
     int count, index, temp, tem, key, q = 1;
     buff[0] = 0;
     buff[1] = length - 1;
